@@ -1,0 +1,43 @@
+# Резервные копии
+backups/
+*.tar.gz
+*.zip
+
+# Конфигурационные файлы с чувствительными данными
+config/x-ui.db
+config/*.pem
+config/*.key
+config/*.crt
+
+# Логи
+*.log
+logs/
+
+# Временные файлы
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS файлы
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Секретные данные
+.env
+.env.local
+secrets/
+*.secret
+
+# SSH ключи
+*.pem
+id_rsa
+id_rsa.pub
