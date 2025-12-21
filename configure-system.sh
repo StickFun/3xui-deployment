@@ -69,16 +69,19 @@ if [ "$config_ssh" = "y" ]; then
     # Бэкап оригинального конфига
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
     
-    # Отключение входа для root через пароль (только по ключу)
-    sed -i 's/#PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-    sed -i 's/PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    # Полное отключение входа для root
+    sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+    sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+    sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+    sed -i 's/PermitRootLogin without-password/PermitRootLogin no/' /etc/ssh/sshd_config
     
     # Отключение пустых паролей
     sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/' /etc/ssh/sshd_config
+    sed -i 's/PermitEmptyPasswords yes/PermitEmptyPasswords no/' /etc/ssh/sshd_config
     
     # Перезапуск SSH
     systemctl restart sshd
-    log_info "SSH настроен. Убедитесь, что у вас есть SSH ключ!"
+    log_warn "ВАЖНО: Вход для root полностью отключен! Используйте созданного пользователя для SSH доступа."
 fi
 
 # Установка дополнительных инструментов мониторинга

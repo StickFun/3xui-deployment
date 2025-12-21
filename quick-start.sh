@@ -72,12 +72,81 @@ EOF
 echo -e "${NC}"
 
 echo ""
+echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}                 ДАННЫЕ ДЛЯ ДОСТУПА                    ${NC}"
+echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+echo ""
+
+# Вывод данных SSH
+if [ -f "/root/3xui-user-credentials.txt" ]; then
+    echo -e "${YELLOW}📌 SSH Доступ:${NC}"
+    cat /root/3xui-user-credentials.txt
+    echo ""
+fi
+
+# Вывод данных 3X-UI панели
+echo -e "${YELLOW}📌 Панель 3X-UI:${NC}"
+panel_port=$(sudo ufw status | grep "3X-UI Panel" | awk '{print $1}' | cut -d'/' -f1 | head -1)
+if [ -z "$panel_port" ]; then
+    panel_port="54321"
+fi
+server_ip=$(hostname -I | awk '{print $1}')
+echo "Логин и пароль: сгенерированы установщиком 3X-UI"
+echo "Посмотреть данные для входа: sudo x-ui"
+echo ""
+
+# Вывод путей к сертификатам
+if [ -f "/etc/x-ui/certs/fullchain.pem" ]; then
+    echo -e "${YELLOW}📌 SSL Сертификаты:${NC}"
+    echo "Сертификат: /etc/x-ui/certs/fullchain.pem"
+    echo "Ключ: /etc/x-ui/certs/privkey.pem"
+    echo ""
+fi
+
+echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}                 ВАЖНЫЕ РЕКОМЕНДАЦИИ                   ${NC}"
+echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+echo ""
+
+echo -e "${YELLOW}🔐 1. Измените пароль панели администратора:${NC}"
+echo "   - Войдите в веб-панель"
+echo "   - Перейдите в Настройки панели → Изменить пароль"
+echo "   - Установите надежный пароль"
+echo ""
+
+echo -e "${YELLOW}🔐 2. Включите двухфакторную аутентификацию (2FA):${NC}"
+echo "   - Откройте Настройки панели"
+echo "   - Найдите раздел 'Двухфакторная аутентификация'"
+echo "   - Включите 2FA и отсканируйте QR-код приложением (Google Authenticator, Authy)"
+echo ""
+
+echo -e "${YELLOW}🔒 3. Настройте SSL/TLS сертификаты в панели:${NC}"
+echo "   - Перейдите в Настройки панели → Настройки SSL"
+echo "   - Укажите пути к сертификатам:"
+echo "     Сертификат: /etc/x-ui/certs/fullchain.pem"
+echo "     Ключ: /etc/x-ui/certs/privkey.pem"
+echo "   - Сохраните и перезапустите панель"
+echo ""
+
+echo -e "${YELLOW}📧 4. Отключите подписку (опционально):${NC}"
+echo "   - Откройте Настройки панели"
+echo "   - Найдите раздел 'Подписка' или 'Subscription'"
+echo "   - Отключите автоматическую подписку, если не требуется"
+echo ""
+
+echo -e "${YELLOW}💾 5. Сохраните учетные данные в безопасном месте:${NC}"
+echo "   - SSH данные из /root/3xui-user-credentials.txt"
+echo "   - Новый пароль панели администратора"
+echo "   - Коды восстановления 2FA"
+echo ""
+
+echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+echo ""
 echo -e "${GREEN}Следующие шаги:${NC}"
-echo "1. Откройте панель в браузере"
-echo "2. Войдите с логином: admin, паролем: admin"
-echo "3. Измените логин и пароль"
-echo "4. Настройте конфигурации X-Ray"
-echo "5. Создайте пользователей"
+echo "1. Узнайте логин, пароль командой и адрес веб-панели: sudo x-ui"
+echo "2. Войдите в панель и выполните рекомендации выше"
+echo "3. Настройте конфигурации X-Ray"
+echo "4. Создайте пользователей"
 echo ""
 echo -e "${YELLOW}Полная документация: README.md${NC}"
 echo -e "${YELLOW}Настройка конфигураций: config/README.md${NC}"
