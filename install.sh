@@ -34,40 +34,45 @@ fi
 
 log_info "Начало установки и настройки системы для 3X-UI..."
 
-# Создание нового пользователя
-log_info "Создание нового пользователя..."
-while true; do
-    read -p "Введите имя нового пользователя: " new_username
-    if [ -z "$new_username" ]; then
-        log_error "Имя пользователя не может быть пустым!"
-        continue
-    fi
-    if id "$new_username" &>/dev/null; then
-        log_warn "Пользователь $new_username уже существует, введите другое имя"
-        continue
-    fi
-    break
-done
+# Создание нового пользователя (опционально)
+read -p "Создать нового пользователя для SSH доступа? (y/n): " create_user
+if [ "$create_user" = "y" ]; then
+    log_info "Создание нового пользователя..."
+    while true; do
+        read -p "Введите имя нового пользователя: " new_username
+        if [ -z "$new_username" ]; then
+            log_error "Имя пользователя не может быть пустым!"
+            continue
+        fi
+        if id "$new_username" &>/dev/null; then
+            log_warn "Пользователь $new_username уже существует, введите другое имя"
+            continue
+        fi
+        break
+    done
 
-# Генерация случайного пароля
-random_password=$(openssl rand -base64 16 | tr -d "=+/" | cut -c1-16)
+    # Генерация случайного пароля
+    random_password=$(openssl rand -base64 16 | tr -d "=+/" | cut -c1-16)
 
-# Создание пользователя
-useradd -m -s /bin/bash "$new_username"
-echo "$new_username:$random_password" | chpasswd
+    # Создание пользователя
+    useradd -m -s /bin/bash "$new_username"
+    echo "$new_username:$random_password" | chpasswd
 
-# Добавление в группу sudo
-usermod -aG sudo "$new_username"
+    # Добавление в группу sudo
+    usermod -aG sudo "$new_username"
 
-# Сохранение данных пользователя
-echo "Пользователь: $new_username" > /root/3xui-user-credentials.txt
-echo "Пароль: $random_password" >> /root/3xui-user-credentials.txt
-chmod 600 /root/3xui-user-credentials.txt
+    # Сохранение данных пользователя
+    echo "Пользователь: $new_username" > /root/3xui-user-credentials.txt
+    echo "Пароль: $random_password" >> /root/3xui-user-credentials.txt
+    chmod 600 /root/3xui-user-credentials.txt
 
-log_info "Пользователь $new_username создан и добавлен в группу sudo"
-log_warn "ВАЖНО: Данные для входа сохранены в /root/3xui-user-credentials.txt"
-log_warn "Пользователь: $new_username"
-log_warn "Пароль: $random_password"
+    log_info "Пользователь $new_username создан и добавлен в группу sudo"
+    log_warn "ВАЖНО: Данные для входа сохранены в /root/3xui-user-credentials.txt"
+    log_warn "Пользователь: $new_username"
+    log_warn "Пароль: $random_password"
+else
+    log_info "Создание нового пользователя пропущено"
+fi
 
 # Обновление системы
 log_info "Обновление списка пакетов..."
@@ -110,11 +115,6 @@ ufw allow 22/tcp comment 'SSH'
 ufw allow 80/tcp comment 'HTTP'
 ufw allow 443/tcp comment 'HTTPS'
 
-# Запрос порта для панели
-log_info "Настройка порта для 3X-UI панели..."
-read -p "Введите порт для панели 3X-UI (по умолчанию 54321): " panel_port
-panel_port=${panel_port:-54321}
-ufw allow $panel_port/tcp comment '3X-UI Panel'
 ufw allow 2053/tcp comment 'X-Ray'
 ufw allow 2096/tcp comment 'X-Ray'
 ufw reload
@@ -182,7 +182,7 @@ log_info "Установка завершена успешно!"
 log_info "═══════════════════════════════════════════════"
 log_info ""
 log_info "3X-UI панель доступна по адресу:"
-log_info "http://ваш-ip:$panel_port"
+log_info "http://ваш-ip:порт (порт указан в настройках панели)"
 log_info ""
 log_info "Стандартные данные для входа в панель:"
 log_info "Логин: admin"
