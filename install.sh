@@ -162,7 +162,23 @@ fi
 
 # Установка 3X-UI
 log_info "Установка 3X-UI панели..."
-bash <(cat ./assets/install-3xui-21-12-2025.sh)
+log_info ""
+log_info "Выберите способ установки 3X-UI:"
+log_info "  1) Использовать локальный скрипт из assets (офлайн)"
+log_info "  2) Скачать и запустить последнюю версию с GitHub (онлайн)"
+log_info ""
+read -p "Ваш выбор [1/2]: " install_method
+
+case "$install_method" in
+    2)
+        log_info "Загрузка и запуск скрипта установки с GitHub..."
+        bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+        ;;
+    *)
+        log_info "Запуск локального скрипта установки из assets..."
+        bash <(cat ./assets/install-3xui-21-12-2025.sh)
+        ;;
+esac
 
 # Применение кастомной конфигурации, если она есть
 if [ -f "./config/x-ui.db" ]; then
