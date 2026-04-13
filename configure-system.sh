@@ -79,8 +79,20 @@ if [ "$config_ssh" = "y" ]; then
     sed -i 's/#PermitEmptyPasswords no/PermitEmptyPasswords no/' /etc/ssh/sshd_config
     sed -i 's/PermitEmptyPasswords yes/PermitEmptyPasswords no/' /etc/ssh/sshd_config
     
-    # Перезапуск SSH
-    systemctl restart sshd
+    # Перезапуск SSH (определяем имя сервиса: sshd или ssh)
+    if systemctl list-units --type=service --all | grep -q 'sshd.service'; then
+        SSH_SERVICE="sshd"
+    elif systemctl list-units --type=service --all | grep -q 'ssh.service'; then
+        SSH_SERVICE="ssh"
+    else
+        log_warn "SSH сервис не найден! Перезапустите SSH вручную."
+        SSH_SERVICE=""
+    fi
+
+    if [ -n "$SSH_SERVICE" ]; then
+        systemctl restart "$SSH_SERVICE"
+        log_info "SSH сервис ($SSH_SERVICE) перезапущен."
+    fi
     log_warn "ВАЖНО: Вход для root полностью отключен! Используйте созданного пользователя для SSH доступа."
 fi
 
